@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 describe Spree::Core::ControllerHelpers::SSL, :type => :controller do
-  controller do
-    include Spree::Core::ControllerHelpers::SSL
-    def index; render text: 'index'; end
-    def self.ssl_supported?; true; end
-  end
   before do
     @routes.draw do
       get '/anonymous/index'
     end
+  end
+  controller do
+    include Spree::Core::ControllerHelpers::SSL
+    def index; render text: 'index'; end
+    def self.ssl_supported?; true; end
   end
 
   describe 'redirect to http' do
