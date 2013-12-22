@@ -10,23 +10,9 @@ module Spree
       end
 
       module Request
-        class SuperAbility
-          include CanCan::Ability
-
-          def initialize(user)
-            # allow anyone to perform anything on anything
-            can :manage, :all
-          end
-        end
-
         def stub_authorization!
-          after(:all) do
-            ability = Spree::TestingSupport::AuthorizationHelpers::Request::SuperAbility
-            Spree::Ability.remove_ability(ability)
-          end
-          before(:all) do
-            ability = Spree::TestingSupport::AuthorizationHelpers::Request::SuperAbility
-            Spree::Ability.register_ability(ability)
+          custom_authorization! do |user|
+            can :manage, :all
           end
         end
 
@@ -40,6 +26,9 @@ module Spree
           end
           before(:all) do
             Spree::Ability.register_ability(ability)
+          end
+          before(:each) do
+            Spree::Api::Config[:requires_authentication] = false
           end
         end
       end
