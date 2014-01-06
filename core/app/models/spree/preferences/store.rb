@@ -26,7 +26,7 @@ module Spree::Preferences
       should_persist? && Spree::Preference.where(:key => key).exists?
     end
 
-    def get(key,fallback=nil)
+    def get(key)
       # return the retrieved value, if it's in the cache
       # use unless nil? incase the value is actually boolean false
       #
@@ -44,7 +44,7 @@ module Spree::Preferences
           val = preference.value
         else
           # use the fallback value
-          val = fallback
+          val = yield if block_given?
         end
 
         # Cache either the value from the db or the fallback value.
@@ -53,7 +53,7 @@ module Spree::Preferences
 
         return val
       else
-        return fallback
+        return yield if block_given?
       end
     end
 
