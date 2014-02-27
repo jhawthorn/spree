@@ -1,5 +1,5 @@
 module Spree::Preferences
-  module PreferableClassMethods
+  module BaseClassMethods
 
     def preference(name, type, *args)
       options = args.extract_options!
