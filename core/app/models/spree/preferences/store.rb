@@ -20,6 +20,7 @@ module Spree::Preferences
       @cache.write(key, value)
       persist(key, value)
     end
+    alias_method :[]=, :set
 
     def exist?(key)
       @cache.exist?(key) ||
@@ -44,7 +45,7 @@ module Spree::Preferences
           val = preference.value
         else
           # use the fallback value
-          val = yield if block_given?
+          val = yield
         end
 
         # Cache either the value from the db or the fallback value.
@@ -53,9 +54,10 @@ module Spree::Preferences
 
         return val
       else
-        return yield if block_given?
+        yield
       end
     end
+    alias_method :fetch, :get
 
     def delete(key)
       @cache.delete(key)
