@@ -22,7 +22,7 @@
 #
 module Spree::Preferences
   class Configuration
-    include Spree::Preferences::Preferable
+    include Spree::Preferences::Base
 
     def configure
       yield(self) if block_given?

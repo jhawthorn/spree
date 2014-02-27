@@ -11,6 +11,10 @@ describe Spree::Preferences::Preferable do
         @id = rand(999)
       end
 
+      def preference_store
+        @preference_store ||= {}
+      end
+
       preference :color, :string, :default => 'green'
     end
 
@@ -196,6 +200,7 @@ describe Spree::Preferences::Preferable do
         def self.up
           create_table :pref_tests do |t|
             t.string :col
+            t.text :preference_store
           end
         end
 
