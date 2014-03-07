@@ -43,6 +43,9 @@ require 'spree/testing_support/capybara_ext'
 require 'paperclip/matchers'
 
 require 'capybara/poltergeist'
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, {debug: true})
+end
 Capybara.javascript_driver = :poltergeist
 
 RSpec.configure do |config|
