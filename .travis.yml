@@ -1,4 +1,5 @@
 bundler_args: --without development production --quiet
+cache: bundler
 env:
   - GEM=backend DB=mysql
   - GEM=backend DB=postgres
