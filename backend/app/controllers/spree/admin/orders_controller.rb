@@ -55,6 +55,7 @@ module Spree
       end
 
       def edit
+        puts "Orders#edit"
         unless @order.complete?
           @order.refresh_shipment_rates
         end

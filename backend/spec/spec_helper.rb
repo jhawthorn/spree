@@ -80,6 +80,9 @@ RSpec.configure do |config|
     # Ensure js requests finish processing before advancing to the next test
     wait_for_ajax if example.metadata[:js]
 
+    # BVACK!
+    p page.driver.network_traffic
+
     DatabaseCleaner.clean
   end
 
