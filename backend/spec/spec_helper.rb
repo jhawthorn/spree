@@ -80,7 +80,9 @@ RSpec.configure do |config|
     # Ensure js requests finish processing before advancing to the next test
     wait_for_ajax if example.metadata[:js]
 
+    sleep 5
     DatabaseCleaner.clean
+    sleep 5
   end
 
   config.after(:each, :type => :feature) do
