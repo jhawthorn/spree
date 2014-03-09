@@ -1,32 +1,13 @@
-# The preference_cache_key is used to determine if the preference
-# can be set. The default behavior is to return nil if there is no
-# id value. On ActiveRecords, new objects will have their preferences
-# saved to a pending hash until it is persisted.
-#
 # class_attributes are inheritied unless you reassign them in
 # the subclass, so when you inherit a Preferable class, the
 # inherited hook will assign a new hash for the subclass definitions
 # and copy all the definitions allowing the subclass to add
 # additional defintions without affecting the base
 module Spree::Preferences::Preferable
+  extend ActiveSupport::Concern
 
-  def self.included(base)
-    base.class_eval do
-      extend Spree::Preferences::PreferableClassMethods
-
-      if respond_to?(:after_create)
-        after_create do |obj|
-          obj.save_pending_preferences
-        end
-      end
-
-      if respond_to?(:after_destroy)
-        after_destroy do |obj|
-          obj.clear_preferences
-        end
-      end
-
-    end
+  included do
+    extend Spree::Preferences::PreferableClassMethods
   end
 
   def get_preference(name)
@@ -63,27 +44,17 @@ module Spree::Preferences::Preferable
     end
   end
 
-  def preferences
+  def default_preferences
     Hash[
       defined_preferences.map do |preference|
-        [preference, get_preference(preference)]
+        [preference, preference_default(preference)]
       end
     ]
   end
 
-  def rails_cache_id
-    ENV['RAILS_CACHE_ID']
-  end
-
-  def save_pending_preferences
-    return unless @pending_preferences
-    @pending_preferences.each do |name, value|
-      set_preference(name, value)
-    end
-  end
 
   def clear_preferences
-    preferences.keys.each {|pref| preference_store.delete pref}
+    preferences.keys.each {|pref| preferences.delete pref}
   end
 
   private
@@ -113,13 +84,4 @@ module Spree::Preferences::Preferable
     end
   end
 
-  def preference_store
-    if id
-      # FIXME: incompatible with previous impl
-      Spree::Preferences::ScopedStore.new([rails_cache_id, self.class.name, id].compact.join('::').underscore)
-    else
-      @pending_preferences ||= {}
-    end
-  end
 end
-

@@ -28,7 +28,7 @@ module Spree::Preferences
       yield(self) if block_given?
     end
 
-    def preference_store
+    def preferences
       ScopedStore.new([rails_cache_id, self.class.name].compact.join('::').underscore)
     end
 

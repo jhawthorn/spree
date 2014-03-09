@@ -10,14 +10,17 @@ module Spree::Preferences
       # cache_key will be nil for new objects, then if we check if there
       # is a pending preference before going to default
       define_method preference_getter_method(name) do
-        preference_store.fetch(name) do
+        preferences.fetch(name) do
           default.call
         end
       end
 
       define_method preference_setter_method(name) do |value|
         value = convert_preference_value(value, type)
-        preference_store[name] = value
+        preferences[name] = value
+
+        # In-place changes to serialized columns don't work with autosave: true
+        preferences_will_change! if respond_to?(:preferences_will_change!)
       end
 
       define_method preference_default_getter_method(name), &default
