@@ -132,8 +132,11 @@ module Spree
       !!deleted_at
     end
 
+    # determine if product is available.
+    # deleted products and products with nil or future available_on date
+    # are not available
     def available?
-      !(available_on.nil? || available_on.future?)
+      !(available_on.nil? || available_on.future?) && !deleted?
     end
 
     # split variants list into hash which shows mapping of opt value onto matching variants
@@ -188,7 +191,7 @@ module Spree
     end
 
     def possible_promotions
-      promotion_ids = promotion_rules.map(&:activator_id).uniq
+      promotion_ids = promotion_rules.map(&:promotion_id).uniq
       Spree::Promotion.advertised.where(id: promotion_ids).reject(&:expired?)
     end
 
