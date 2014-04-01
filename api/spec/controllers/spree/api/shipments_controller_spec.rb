@@ -84,7 +84,48 @@ describe Spree::Api::ShipmentsController do
         api_put :remove, { variant_id: variant.to_param, quantity: 1 }
         response.status.should == 200
         json_response['manifest'].detect { |h| h['variant']['id'] == variant.id }["quantity"].should == 1
-     end
+      end
+    end
+
+    context 'multiple shipments' do
+      let(:order) { create :completed_order_with_totals }
+      let!(:resource_scoping) { { :order_id => order.to_param, :source_id => order.shipments.first.to_param } }
+
+      it 'transfers a variant to an existing shipment' do
+        other_shipment = create(:shipment, order: order)
+        order.contents.add(variant, 5)
+
+        expect {
+          api_put :transfer, { target_id: other_shipment.to_param, variant_id: variant.to_param, quantity: 2 }
+        }.to_not change(Spree::Shipment, :count)
+        expect(response).to be_success
+
+        shipments = json_response['shipments']
+        manifests = shipments.map{|s| s['manifest']}
+
+        expect(manifests[0].last['variant']['id']).to eq(variant.id)
+        expect(manifests[0].last['quantity']).to eq(3)
+
+        expect(manifests[1].last['variant']['id']).to eq(variant.id)
+        expect(manifests[1].last['quantity']).to eq(2)
+      end
+
+      it 'transfers a variant to a new shipment' do
+        order.contents.add(variant, 5)
+
+        api_put :transfer, { variant_id: variant.to_param, quantity: 2 }
+        expect(response).to be_success
+
+        shipments = json_response['shipments']
+        manifests = shipments.map{|s| s['manifest']}
+
+        expect(manifests[0].last['variant']['id']).to eq(variant.id)
+        expect(manifests[0].last['quantity']).to eq(3)
+
+        expect(manifests[1].size).to eq(1)
+        expect(manifests[1].first['variant']['id']).to eq(variant.id)
+        expect(manifests[1].first['quantity']).to eq(2)
+      end
     end
 
     context "can transition a shipment from ready to ship" do
