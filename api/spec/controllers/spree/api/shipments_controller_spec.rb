@@ -84,7 +84,55 @@ describe Spree::Api::ShipmentsController do
         api_put :remove, { variant_id: variant.to_param, quantity: 1 }
         response.status.should == 200
         json_response['manifest'].detect { |h| h['variant']['id'] == variant.id }["quantity"].should == 1
-     end
+      end
+    end
+
+    context 'multiple shipments' do
+      let(:order) { create :completed_order_with_totals }
+      let!(:resource_scoping) { { :order_id => order.to_param, :source_id => order.shipments.first.to_param } }
+
+      it 'transfers a variant to an existing shipment' do
+        other_shipment = create(:shipment, order: order)
+        order.contents.add(variant, 5)
+
+        expect {
+          api_put :transfer, { target_id: other_shipment.to_param, variant_id: variant.to_param, quantity: 2 }
+        }.to_not change(Spree::Shipment, :count)
+        expect(response).to be_success
+
+        shipments = json_response['shipments']
+        manifests = shipments.map{|s| s['manifest']}
+
+        expect(manifests[0]).to include({"quantity"=>3,
+                                         "states"=>{"on_hand"=>2, "backordered"=>1},
+                                         "price"=>"$59.97",
+                                         "variant_id"=>variant.id})
+        expect(manifests[1]).to include({"quantity"=>2,
+                                         "states"=>{"backordered"=>2},
+                                         "price"=>"$39.98",
+                                         "variant_id"=>variant.id})
+      end
+
+      it 'transfers a variant to a new shipment' do
+        order.contents.add(variant, 5)
+
+        expect {
+          api_put :transfer, { variant_id: variant.to_param, quantity: 2, stock_location_id: stock_location.id }
+        }.to change(Spree::Shipment, :count).by(1)
+        expect(response).to be_success
+
+        shipments = json_response['shipments']
+        manifests = shipments.map{|s| s['manifest']}
+
+        expect(manifests[0]).to include({"quantity"=>3,
+                                         "states"=>{"on_hand"=>2, "backordered"=>1},
+                                         "price"=>"$59.97",
+                                         "variant_id"=>variant.id})
+        expect(manifests[1]).to include({"quantity"=>2,
+                                         "states"=>{"backordered"=>2},
+                                         "price"=>"$39.98",
+                                         "variant_id"=>variant.id})
+      end
     end
 
     context "can transition a shipment from ready to ship" do

@@ -34,6 +34,9 @@ Spree::Core::Engine.add_routes do
       end
 
       resources :shipments, :only => [:create, :update] do
+        collection do
+          put :transfer
+        end
         member do
           put :ready
           put :ship

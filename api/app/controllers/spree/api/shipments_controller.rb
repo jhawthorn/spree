@@ -19,7 +19,7 @@ module Spree
       end
 
       def update
-        @shipment = @order.shipments.accessible_by(current_ability, :update).find_by!(number: params[:id])
+        @shipment = find_shipment(params[:id])
 
         unlock = params[:shipment].delete(:unlock)
 
@@ -73,6 +73,33 @@ module Spree
         respond_with(@shipment, default_template: :show)
       end
 
+      # Params
+      #   :variant_id (required) The variant to transfer
+      #   :source_id (required) The source shipment's id
+      #   one of (required):
+      #     :target_id The shipment to transfer into
+      #     :stock_location_id The stock location for a new shipment
+      def transfer
+        variant = Spree::Variant.find(params[:variant_id])
+        quantity = params[:quantity].to_i
+
+        source = find_shipment(params.require(:source_id))
+        if params[:target_id].present?
+          target = find_shipment(params[:target_id])
+        else
+          authorize! :create, Shipment
+          target = @order.shipments.create!(stock_location_id: params.require(:stock_location_id))
+        end
+
+        @order.contents.remove(variant, quantity, source)
+        @order.contents.add(variant, quantity, nil, target)
+
+        source.refresh_rates
+        target.refresh_rates
+
+        respond_with(@order, default_template: 'spree/api/orders/show')
+      end
+
       private
 
       def find_order
@@ -80,8 +107,12 @@ module Spree
         authorize! :read, @order
       end
 
+      def find_shipment number
+        @order.shipments.accessible_by(current_ability, :update).find_by!(number: number)
+      end
+
       def find_and_update_shipment
-        @shipment = @order.shipments.accessible_by(current_ability, :update).find_by!(number: params[:id])
+        @shipment = find_shipment(params[:id])
         @shipment.update_attributes(shipment_params)
         @shipment.reload
       end
