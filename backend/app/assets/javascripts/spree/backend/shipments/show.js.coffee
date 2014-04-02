@@ -168,39 +168,21 @@ Spree.Admin.ShipmentShow = Backbone.View.extend
     new_shipment = selected_shipment.data('new-shipment');
 
     if stock_location_id != 'new_shipment'
-      # first remove item(s) from original shipment
       $.ajax
         type: "PUT"
-        async: false
-        url: Spree.url(this.model.url() + "/remove.json")
+        # TODO: Figure out a better way to get to the collection's URL
+        # That'd probably start with actually defining a collection.
+        url: Spree.url(original_shipment.order().url() + "/shipments/transfer.json"),
         data:
-          variant_id: variant_id
+          source_id: original_shipment.id
+          variant_id: variant_id,
           quantity: quantity
-
-      if new_shipment != undefined
-        $.ajax
-          type: "POST"
-          async: false
-          # TODO: Figure out a better way to get to the collection's URL
-          # That'd probably start with actually defining a collection.
-          url: Spree.url(original_shipment.order().url() + "/shipments.json"),
-          data:
-            variant_id: variant_id,
-            quantity: quantity
-            stock_location_id: stock_location_id
-        .done (shipment) ->
-          original_shipment.advanceOrder()
-      else
-        target_shipment = new Spree.Shipment(number: target_shipment_number)
-        $.ajax
-          type: "PUT"
-          async: false
-          url: Spree.url(target_shipment.url() + "/add.json"),
-          data:
-            variant_id: variant_id
-            quantity: quantity
-        .done ->
-          original_shipment.advanceOrder()
+          target_id: target_shipment_number if !new_shipment
+          stock_location_id: stock_location_id if new_shipment
+      .done (order) ->
+        original_shipment.order().set(order)
+      .error (msg) ->
+        console.error(msg)
 
   toggleMethodEdit: (e) -> 
     e.preventDefault()
