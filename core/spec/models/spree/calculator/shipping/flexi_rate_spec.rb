@@ -12,12 +12,13 @@ module Spree
       let(:package) do
         Stock::Package.new(
           build(:stock_location),
-          mock_model(Order),
-          [
-            Stock::Package::ContentItem.new(line_item1, variant1, 4),
-            Stock::Package::ContentItem.new(line_item2, variant2, 6)
-          ]
+          mock_model(Order)
         )
+      end
+
+      before do
+        package.add line_item1, 4
+        package.add line_item2, 6
       end
 
       let(:subject) { FlexiRate.new }

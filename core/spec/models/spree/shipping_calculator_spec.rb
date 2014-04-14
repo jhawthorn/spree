@@ -11,12 +11,13 @@ module Spree
     let(:package) do
       Stock::Package.new(
         build(:stock_location),
-        mock_model(Order, currency: 'USD'),
-        [
-          Stock::Package::ContentItem.new(line_item1, variant1, 2),
-          Stock::Package::ContentItem.new(line_item2, variant2, 1)
-        ]
+        mock_model(Order, currency: 'USD')
       )
+    end
+
+    before do
+      package.add line_item1, 2
+      package.add line_item2, 1
     end
 
     subject { ShippingCalculator.new }

@@ -50,22 +50,26 @@ module Spree
         method2   = create(:shipping_method)
         method1.shipping_categories = [category1, category2]
         method2.shipping_categories = [category1]
-        variant1 = mock_model(Variant, shipping_category: category1)
-        variant2 = mock_model(Variant, shipping_category: category2)
-        variant3 = mock_model(Variant, shipping_category: nil)
-        contents = [Package::ContentItem.new(line_item, variant1, 1),
-                    Package::ContentItem.new(line_item, variant1, 1),
-                    Package::ContentItem.new(line_item, variant2, 1),
-                    Package::ContentItem.new(line_item, variant3, 1)]
+        variants = [
+          mock_model(Variant, shipping_category: category1),
+          mock_model(Variant, shipping_category: category2),
+          mock_model(Variant, shipping_category: nil)
+        ]
+        line_items = variants.map do |variant|
+          mock_model(LineItem, variant: variant)
+        end
 
-        package = Package.new(stock_location, order, contents)
+        package = Package.new(stock_location, order)
+        package.add line_items[0], 2
+        package.add line_items[1], 1
+        package.add line_items[2], 1
         package.shipping_methods.should == [method1]
       end
 
       it 'builds an empty list of shipping methods when no categories' do
         variant  = mock_model(Variant, shipping_category: nil)
-        contents = [Package::ContentItem.new(line_item, variant, 1)]
-        package  = Package.new(stock_location, order, contents)
+        package  = Package.new(stock_location, order)
+        package.add line_item, 1
         package.shipping_methods.should be_empty
       end
 
