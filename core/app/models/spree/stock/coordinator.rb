@@ -32,6 +32,14 @@ module Spree
         packages
       end
 
+      # create shipments on @order
+      def create_shipments
+        packages.each do |package|
+          order.shipments << package.to_shipment
+        end
+        order.shipments
+      end
+
       private
       def prioritize_packages(packages)
         prioritizer = Prioritizer.new(order, packages)
