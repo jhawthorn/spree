@@ -31,20 +31,15 @@ module DelegateBelongsTo
       end
       opts = attrs.extract_options!
       attrs.each do |attr|
-        class_def attr do |*args|
+        define_method attr do |*args|
           send(:delegator_for, association, attr, *args)
         end
 
-        class_def "#{attr}=" do |val|
+        define_method "#{attr}=" do |val|
           send(:delegator_for_setter, association, attr, val)
         end
       end
     end
-
-    private
-      def class_def(name, method=nil, &blk)
-        class_eval { method.nil? ? define_method(name, &blk) : define_method(name, method) }
-      end
   end
 
   def delegator_for(association, attr, *args)
