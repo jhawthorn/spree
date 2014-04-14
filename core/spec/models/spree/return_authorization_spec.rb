@@ -127,9 +127,9 @@ describe Spree::ReturnAuthorization do
       end
 
       it "should update the stock item counts in new stock location" do
-        count_on_hand = Spree::StockItem.where(variant_id: inventory_unit.variant_id, stock_location_id: new_stock_location.id).first.count_on_hand
+        count_on_hand = Spree::StockItem.where(variant_id: inventory_unit.variant.id, stock_location_id: new_stock_location.id).first.count_on_hand
         return_authorization.receive!
-        Spree::StockItem.where(variant_id: inventory_unit.variant_id, stock_location_id: new_stock_location.id).first.count_on_hand.should == count_on_hand + 1
+        Spree::StockItem.where(variant_id: inventory_unit.variant.id, stock_location_id: new_stock_location.id).first.count_on_hand.should == count_on_hand + 1
       end
 
       it "should not update the stock item counts in the original stock location" do
