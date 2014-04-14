@@ -15,8 +15,8 @@ module Spree
         @shipping_rates = Array.new
       end
 
-      def add(line_item, quantity, state = :on_hand, variant = nil)
-        contents << ContentItem.new(line_item, variant || line_item.variant, quantity, state)
+      def add(line_item, quantity, state = :on_hand)
+        contents << ContentItem.new(line_item, line_item.variant, quantity, state)
       end
 
       def weight
