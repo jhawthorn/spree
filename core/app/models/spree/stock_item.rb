@@ -25,16 +25,12 @@ module Spree
     def adjust_count_on_hand(value)
       self.with_lock do
         self.count_on_hand = self.count_on_hand + value
-        process_backorders(count_on_hand - count_on_hand_was)
-
         self.save!
       end
     end
 
     def set_count_on_hand(value)
       self.count_on_hand = value
-      process_backorders(count_on_hand - count_on_hand_was)
-
       self.save!
     end
 
