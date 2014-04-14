@@ -30,7 +30,6 @@ module DelegateBelongsTo
         raise "delegate_belongs_to: default attrs no longer supported"
       end
       opts = attrs.extract_options!
-      initialize_association :belongs_to, association, opts
       attrs.each do |attr|
         class_def attr do |*args|
           send(:delegator_for, association, attr, *args)
@@ -42,15 +41,6 @@ module DelegateBelongsTo
       end
     end
 
-    protected
-
-      ##
-      # initialize_association :belongs_to, :contact
-      def initialize_association(type, association, opts={})
-        raise 'Illegal or unimplemented association type.' unless [:belongs_to].include?(type.to_s.to_sym)
-        send type, association, opts if reflect_on_association(association).nil?
-      end
-
     private
       def class_def(name, method=nil, &blk)
         class_eval { method.nil? ? define_method(name, &blk) : define_method(name, method) }
@@ -58,7 +48,7 @@ module DelegateBelongsTo
   end
 
   def delegator_for(association, attr, *args)
-    return if self.class.column_names.include?(attr.to_s)
+    raise if self.class.column_names.include?(attr.to_s)
     send("#{association}=", self.class.reflect_on_association(association).klass.new) if send(association).nil?
     if args.empty?
       send(association).send(attr)
@@ -68,7 +58,7 @@ module DelegateBelongsTo
   end
 
   def delegator_for_setter(association, attr, val)
-    return if self.class.column_names.include?(attr.to_s)
+    raise if self.class.column_names.include?(attr.to_s)
     send("#{association}=", self.class.reflect_on_association(association).klass.new) if send(association).nil?
     send(association).send("#{attr}=", val)
   end
