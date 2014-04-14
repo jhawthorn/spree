@@ -76,10 +76,6 @@ module Spree
         end
       end
 
-      def currency
-        #TODO calculate from first variant?
-      end
-
       def shipping_categories
         contents.map { |item| item.variant.shipping_category }.compact.uniq
       end
