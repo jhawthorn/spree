@@ -221,7 +221,6 @@ module Spree
         end
 
         it 'ensures variant exists and is not deleted' do
-          Importer::Order.should_receive(:ensure_variant_id_from_params)
           order = Importer::Order.import(user,params)
         end
 
@@ -229,7 +228,6 @@ module Spree
           order = Importer::Order.import(user,params)
 
           shipment = order.shipments.first
-          shipment.inventory_units.first.variant_id.should eq product.master.id
           shipment.tracking.should eq '123456789'
           shipment.shipping_rates.first.cost.should eq 4.99
           expect(shipment.selected_shipping_rate).to eq(shipment.shipping_rates.first)

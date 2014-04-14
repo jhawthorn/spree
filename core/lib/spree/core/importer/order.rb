@@ -41,16 +41,6 @@ module Spree
               shipment = order.shipments.build
               shipment.tracking = s[:tracking]
               shipment.stock_location = Spree::StockLocation.find_by_name!(s[:stock_location])
-
-              inventory_units = s[:inventory_units] || []
-              inventory_units.each do |iu|
-                ensure_variant_id_from_params(iu)
-
-                unit = shipment.inventory_units.build
-                unit.order = order
-                unit.variant_id = iu[:variant_id]
-              end
-
               shipment.save!
 
               shipping_method = Spree::ShippingMethod.find_by_name!(s[:shipping_method])
