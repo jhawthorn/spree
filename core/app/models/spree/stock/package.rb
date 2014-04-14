@@ -6,6 +6,8 @@ module Spree
       attr_reader :stock_location, :order, :contents
       attr_accessor :shipping_rates
 
+      delegate :currency, to: :order
+
       def initialize(stock_location, order, contents=[])
         @stock_location = stock_location
         @order = order

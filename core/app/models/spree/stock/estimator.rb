@@ -51,10 +51,7 @@ module Spree
       def shipping_methods(package)
         package.shipping_methods.select do |ship_method|
           calculator = ship_method.calculator
-          calculator.available?(package) &&
-          ship_method.include?(order.ship_address) &&
-          (calculator.preferences[:currency].nil? ||
-           calculator.preferences[:currency] == currency)
+          calculator.available?(package) && ship_method.include?(order.ship_address)
         end
       end
     end

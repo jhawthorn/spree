@@ -11,7 +11,7 @@ module Spree
     let(:package) do
       Stock::Package.new(
         build(:stock_location),
-        mock_model(Order),
+        mock_model(Order, currency: 'USD'),
         [
           Stock::Package::ContentItem.new(line_item1, variant1, 2),
           Stock::Package::ContentItem.new(line_item2, variant2, 1)
@@ -44,8 +44,22 @@ module Spree
       }.to raise_error
     end
 
-    it 'checks availability for a package' do
-      subject.available?(package).should be_true
+    context 'with no defined currency' do
+      it 'is available' do
+        subject.available?(package).should be_true
+      end
+    end
+    context 'with matching currency' do
+      before{ subject.preferences[:currency] = 'USD' }
+      it 'is available' do
+        subject.available?(package).should be_true
+      end
+    end
+    context 'with different currency' do
+      before{ subject.preferences[:currency] = 'CAD' }
+      it 'is available' do
+        subject.available?(package).should be_false
+      end
     end
 
     it 'calculates totals for content_items' do

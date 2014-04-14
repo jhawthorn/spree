@@ -43,7 +43,7 @@ module Spree
         end
 
         it "does not return shipping rates from a shipping method if the currency is different than the order's currency" do
-          order.currency = "GBP"
+          ShippingMethod.any_instance.stub_chain(:calculator, :available?).and_return(false)
           shipping_rates = subject.shipping_rates(package)
           shipping_rates.should == []
         end
