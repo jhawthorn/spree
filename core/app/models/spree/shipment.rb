@@ -265,7 +265,7 @@ module Spree
       package
     end
 
-    def set_up_inventory(state, variant, order, line_item)
+    def set_up_inventory(state, line_item)
       self.inventory_units.create(
         state: state,
         line_item_id: line_item.id

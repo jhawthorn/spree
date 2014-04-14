@@ -206,23 +206,6 @@ describe Spree::OrderInventory do
 
         subject.send(:remove_from_shipment, shipment, 1).should == 1
       end
-
-      context "inventory unit line item and variant points to different products" do
-        let(:different_line_item) { create(:line_item) }
-
-        let!(:different_inventory) do
-          shipment.set_up_inventory("on_hand", variant, order, different_line_item)
-        end
-
-        context "completed order" do
-          before { order.touch :completed_at }
-
-          it "removes only units that match both line item and variant" do
-            subject.send(:remove_from_shipment, shipment, shipment.inventory_units.count)
-            expect(different_inventory.reload).to be_persisted
-          end
-        end
-      end
     end
   end
 end

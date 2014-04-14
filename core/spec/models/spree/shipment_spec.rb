@@ -509,7 +509,7 @@ describe Spree::Shipment do
 
     it "associates variant and order" do
       expect(inventory_units).to receive(:create).with(params)
-      unit = shipment.set_up_inventory('on_hand', variant, order, line_item)
+      unit = shipment.set_up_inventory('on_hand', line_item)
     end
   end
 
