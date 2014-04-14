@@ -22,10 +22,7 @@ module Spree
       end
 
       initializer "spree.register.stock_splitters" do |app|
-        app.config.spree.stock_splitters = [
-          Spree::Stock::Splitter::ShippingCategory,
-          Spree::Stock::Splitter::Backordered
-        ]
+        app.config.spree.stock_splitters = []
       end
 
       initializer "spree.register.payment_methods" do |app|
