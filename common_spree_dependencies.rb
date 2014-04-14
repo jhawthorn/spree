@@ -30,4 +30,5 @@ group :test do
   gem 'poltergeist', '1.5.0'
   gem 'fast_sqlite'
   gem 'benchmark-ips'
+  gem 'stackprof'
 end
