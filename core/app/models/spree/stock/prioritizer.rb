@@ -18,28 +18,27 @@ module Spree
 
       private
       def adjust_packages
-        order.line_items.each do |line_item|
-          adjuster = @adjuster_class.new(line_item.variant, line_item.quantity)
-
-          visit_packages(adjuster, :on_hand)
-          visit_packages(adjuster, :backordered)
+        # Hash of all adjusters. key is line_item's id
+        adjusters = Hash.new do |h, k|
+          h[k] ||= @adjuster_class.new(line_item)
         end
-      end
 
-      def visit_packages(adjuster, status)
+        adjuster = @adjuster_class.new(line_item.variant, line_item.quantity)
         packages.each do |package|
-          item = package.find_item adjuster.variant, status
-          adjuster.adjust(item) if item
+          adjuster = adjusters[line_item.id]
+
+          package.contents.each do |item|
+            adjuster.adjust(item)
+          end
         end
-      end
 
-      def sort_packages
-        # order packages by preferred stock_locations
-      end
+        def sort_packages
+          # order packages by preferred stock_locations
+        end
 
-      def prune_packages
-        packages.reject! { |pkg| pkg.empty? }
+        def prune_packages
+          packages.reject! { |pkg| pkg.empty? }
+        end
       end
     end
   end
-end
