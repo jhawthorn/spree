@@ -10,7 +10,6 @@ module Spree
       context "packages" do
         it "builds, prioritizes and estimates" do
           subject.should_receive(:build_packages).ordered
-          subject.should_receive(:prioritize_packages).ordered
           subject.should_receive(:estimate_packages).ordered
           subject.packages
         end

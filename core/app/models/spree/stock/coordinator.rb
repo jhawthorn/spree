@@ -9,7 +9,6 @@ module Spree
 
       def packages
         packages = build_packages
-        packages = prioritize_packages(packages)
         packages = estimate_packages(packages)
       end
 
@@ -41,11 +40,6 @@ module Spree
       end
 
       private
-      def prioritize_packages(packages)
-        prioritizer = Prioritizer.new(order, packages)
-        prioritizer.prioritized_packages
-      end
-
       def estimate_packages(packages)
         estimator = Estimator.new(order)
         packages.each do |package|
