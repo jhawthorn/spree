@@ -1,7 +1,9 @@
 module Spree
   module Stock
     class Package
-      ContentItem = Struct.new(:line_item, :variant, :quantity, :state)
+      ContentItem = Struct.new(:line_item, :quantity, :state) do
+        delegate :variant, to: :line_item
+      end
 
       attr_reader :stock_location, :order, :contents
       attr_accessor :shipping_rates
@@ -16,7 +18,7 @@ module Spree
       end
 
       def add(line_item, quantity, state = :on_hand)
-        contents << ContentItem.new(line_item, line_item.variant, quantity, state)
+        contents << ContentItem.new(line_item, quantity, state)
       end
 
       def weight
