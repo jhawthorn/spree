@@ -1,9 +1,11 @@
 module Spree
   class InventoryUnit < Spree::Base
-    belongs_to :order, class_name: "Spree::Order", inverse_of: :inventory_units
     belongs_to :shipment, class_name: "Spree::Shipment", touch: true, inverse_of: :inventory_units
     belongs_to :return_authorization, class_name: "Spree::ReturnAuthorization"
     belongs_to :line_item, class_name: "Spree::LineItem", inverse_of: :inventory_units
+    def order
+      line_item.order
+    end
 
     validate :line_item, :shipment, presence: true
 

@@ -32,8 +32,7 @@ describe Spree::InventoryUnit do
     let!(:unit) do
       shipment.inventory_units.create!(
         state: 'backordered',
-        line_item: line_item,
-        order: order
+        line_item: line_item
       )
     end
 

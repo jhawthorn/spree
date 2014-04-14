@@ -74,7 +74,6 @@ module Spree
           item.quantity.times do |n|
             unit = shipment.inventory_units.build
             unit.pending = true
-            unit.order = order
             unit.line_item = item.line_item
             unit.state = item.state.to_s
           end
