@@ -162,11 +162,6 @@ describe Spree::CreditCard do
       credit_card.number = "  6011-0009-9013-9424  "
       credit_card.number.should == "6011000990139424"
     end
-
-    it "should not raise an exception on non-string input" do
-      credit_card.number = Hash.new
-      credit_card.number.should be_nil
-    end
   end
 
   # Regression test for #3847 & #3896
@@ -240,10 +235,6 @@ describe Spree::CreditCard do
       credit_card.cc_type.should == 'jcb'
 
       credit_card.number = ''
-      credit_card.cc_type = ''
-      credit_card.cc_type.should == ''
-
-      credit_card.number = nil
       credit_card.cc_type = ''
       credit_card.cc_type.should == ''
     end
