@@ -75,7 +75,6 @@ module Spree
             unit = shipment.inventory_units.build
             unit.pending = true
             unit.order = order
-            unit.variant = item.variant
             unit.line_item = item.line_item
             unit.state = item.state.to_s
           end

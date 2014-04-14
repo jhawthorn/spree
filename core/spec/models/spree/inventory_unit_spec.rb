@@ -22,12 +22,19 @@ describe Spree::InventoryUnit do
       shipment.tap(&:save!)
     end
 
+    let!(:line_item) do
+      Spree::LineItem.create!(
+        variant: stock_item.variant,
+        order: order
+      )
+    end
+
     let!(:unit) do
-      unit = shipment.inventory_units.build
-      unit.state = 'backordered'
-      unit.variant_id = stock_item.variant.id
-      unit.order_id = order.id
-      unit.tap(&:save!)
+      shipment.inventory_units.create!(
+        state: 'backordered',
+        line_item: line_item,
+        order: order
+      )
     end
 
     # Regression for #3066
@@ -52,7 +59,7 @@ describe Spree::InventoryUnit do
     it "does not find inventory units that don't match the stock item's variant" do
       other_variant_unit = shipment.inventory_units.build
       other_variant_unit.state = 'backordered'
-      other_variant_unit.variant = create(:variant)
+      other_variant_unit.line_item = create(:line_item)
       other_variant_unit.save!
 
       Spree::InventoryUnit.backordered_for_stock_item(stock_item).should_not include(other_variant_unit)
@@ -93,8 +100,11 @@ describe Spree::InventoryUnit do
   end
 
   context "variants deleted" do
+    let!(:line_item) do
+      create :line_item, variant: stock_item.variant
+    end
     let!(:unit) do
-      Spree::InventoryUnit.create(variant: stock_item.variant)
+      Spree::InventoryUnit.create(line_item: line_item)
     end
 
     it "can still fetch variant" do
@@ -111,10 +121,9 @@ describe Spree::InventoryUnit do
 
   context "#finalize_units!" do
     let!(:stock_location) { create(:stock_location) }
-    let(:variant) { create(:variant) }
     let(:inventory_units) { [
-      create(:inventory_unit, variant: variant),
-      create(:inventory_unit, variant: variant)
+      create(:inventory_unit),
+      create(:inventory_unit)
     ] }
 
     it "should create a stock movement" do

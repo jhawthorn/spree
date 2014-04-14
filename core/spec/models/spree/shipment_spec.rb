@@ -165,8 +165,8 @@ describe Spree::Shipment do
 
       context 'to_package' do
         let(:inventory_units) do
-          [build(:inventory_unit, line_item: line_item, variant: variant, state: 'on_hand'),
-           build(:inventory_unit, line_item: line_item, variant: variant, state: 'backordered')]
+          [build(:inventory_unit, line_item: line_item, state: 'on_hand'),
+           build(:inventory_unit, line_item: line_item, state: 'backordered')]
         end
 
         it 'should use symbols for states when adding contents to package' do

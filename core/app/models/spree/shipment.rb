@@ -249,7 +249,7 @@ module Spree
     end
 
     def inventory_units_for(variant)
-      inventory_units.where(variant_id: variant.id)
+      inventory_units.joins(:line_item).where('spree_line_items.variant_id = ?', variant.id)
     end
 
     def inventory_units_for_item(line_item)

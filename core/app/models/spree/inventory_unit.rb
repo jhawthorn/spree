@@ -1,6 +1,5 @@
 module Spree
   class InventoryUnit < Spree::Base
-    belongs_to :variant, class_name: "Spree::Variant", inverse_of: :inventory_units
     belongs_to :order, class_name: "Spree::Order", inverse_of: :inventory_units
     belongs_to :shipment, class_name: "Spree::Shipment", touch: true, inverse_of: :inventory_units
     belongs_to :return_authorization, class_name: "Spree::ReturnAuthorization"
@@ -11,9 +10,9 @@ module Spree
     scope :backordered, -> { where state: 'backordered' }
     scope :shipped, -> { where state: 'shipped' }
     scope :backordered_per_variant, ->(stock_item) do
-      includes(:shipment, :order)
+      includes(:shipment, line_item: :order)
         .where("spree_shipments.state != 'canceled'").references(:shipment)
-        .where(variant_id: stock_item.variant_id)
+        .where('spree_line_items.variant_id = ?', stock_item.variant_id)
         .where('spree_orders.completed_at is not null')
         .backordered.order("spree_orders.completed_at ASC")
     end
@@ -56,12 +55,12 @@ module Spree
 
     def find_stock_item
       Spree::StockItem.where(stock_location_id: shipment.stock_location_id,
-        variant_id: variant_id).first
+        variant_id: line_item.variant_id).first
     end
 
     # Remove variant default_scope `deleted_at: nil`
     def variant
-      Spree::Variant.unscoped { super }
+      Spree::Variant.unscoped { line_item.variant }
     end
 
     private
