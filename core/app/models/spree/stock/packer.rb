@@ -1,20 +1,15 @@
 module Spree
   module Stock
     class Packer
-      attr_reader :stock_location, :order, :splitters
+      attr_reader :stock_location, :order
 
-      def initialize(stock_location, order, splitters=[])
+      def initialize(stock_location, order)
         @stock_location = stock_location
         @order = order
-        @splitters = splitters
       end
 
       def packages
-        if splitters.empty?
-          [default_package]
-        else
-          build_splitter.split [default_package]
-        end
+        [default_package]
       end
 
       def default_package
@@ -31,15 +26,6 @@ module Spree
           end
         end
         package
-      end
-
-      private
-      def build_splitter
-        splitter = nil
-        splitters.reverse.each do |klass|
-          splitter = klass.new(self, splitter)
-        end
-        splitter
       end
     end
   end
