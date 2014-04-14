@@ -252,8 +252,8 @@ module Spree
       inventory_units.where(variant_id: variant.id)
     end
 
-    def inventory_units_for_item(line_item, variant = nil)
-      inventory_units.where(line_item_id: line_item.id, variant_id: line_item.variant.id || variant.id)
+    def inventory_units_for_item(line_item)
+      inventory_units.where(line_item_id: line_item.id)
     end
 
     def to_package
