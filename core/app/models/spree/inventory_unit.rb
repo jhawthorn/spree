@@ -6,6 +6,8 @@ module Spree
     belongs_to :return_authorization, class_name: "Spree::ReturnAuthorization"
     belongs_to :line_item, class_name: "Spree::LineItem", inverse_of: :inventory_units
 
+    validate :line_item, :shipment, presence: true
+
     scope :backordered, -> { where state: 'backordered' }
     scope :shipped, -> { where state: 'shipped' }
     scope :backordered_per_variant, ->(stock_item) do
@@ -21,7 +23,6 @@ module Spree
       event :fill_backorder do
         transition to: :on_hand, from: :backordered
       end
-      after_transition on: :fill_backorder, do: :update_order
 
       event :ship do
         transition to: :shipped, if: :allow_ship?
@@ -67,10 +68,6 @@ module Spree
 
       def allow_ship?
         Spree::Config[:allow_backorder_shipping] || self.on_hand?
-      end
-
-      def update_order
-        order.update!
       end
   end
 end
