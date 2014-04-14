@@ -20,22 +20,17 @@ module DelegateBelongsTo
 
   module ClassMethods
 
-    @@default_rejected_delegate_columns = ['created_at','created_on','updated_at','updated_on','lock_version','type','id','position','parent_id','lft','rgt']
-    mattr_accessor :default_rejected_delegate_columns
-
     ##
     # Creates methods for accessing and setting attributes on an association.  Uses same
     # default list of attributes as delegates_to_association.
     # @todo Integrate this with ActiveRecord::Dirty, so if you set a property through one of these setters and then call save on this object, it will save the associated object automatically.
-    # delegate_belongs_to :contact
-    # delegate_belongs_to :contact, [:defaults]  ## same as above, and useless
-    # delegate_belongs_to :contact, [:defaults, :address, :fullname], :class_name => 'VCard'
     ##
     def delegate_belongs_to(association, *attrs)
+      if attrs.empty? || attrs.include?(:defaults)
+        raise "delegate_belongs_to: default attrs no longer supported"
+      end
       opts = attrs.extract_options!
       initialize_association :belongs_to, association, opts
-      attrs = get_association_column_names(association) if attrs.empty?
-      attrs.concat get_association_column_names(association) if attrs.delete :defaults
       attrs.each do |attr|
         class_def attr do |*args|
           send(:delegator_for, association, attr, *args)
@@ -48,17 +43,6 @@ module DelegateBelongsTo
     end
 
     protected
-
-      def get_association_column_names(association, without_default_rejected_delegate_columns=true)
-        begin
-          association_klass = reflect_on_association(association).klass
-          methods = association_klass.column_names
-          methods.reject!{|x|default_rejected_delegate_columns.include?(x.to_s)} if without_default_rejected_delegate_columns
-          return methods
-        rescue
-          return []
-        end
-      end
 
       ##
       # initialize_association :belongs_to, :contact
