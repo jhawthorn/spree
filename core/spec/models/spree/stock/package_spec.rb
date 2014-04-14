@@ -31,17 +31,6 @@ module Spree
         subject.quantity(:backordered).should eq 3
       end
 
-      it 'returns nil for content item not found' do
-        item = subject.find_item(variant, :on_hand)
-        item.should be_nil
-      end
-
-      it 'finds content item for a variant' do
-        subject.add line_item, 4, :on_hand
-        item = subject.find_item(variant, :on_hand)
-        item.quantity.should eq 4
-      end
-
       # Contains regression test for #2804
       it 'builds a list of shipping methods common to all categories' do
         category1 = create(:shipping_category)

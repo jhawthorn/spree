@@ -33,16 +33,6 @@ module Spree
         contents.select { |item| item.state == :backordered }
       end
 
-      # Consider extensions and applications might create a inventory unit
-      # where the variant and the line_item might not refer to the same product
-      def find_item(variant, state = :on_hand, line_item = nil)
-        contents.select do |item|
-          item.variant == variant &&
-          item.state == state &&
-          (line_item.nil? || line_item == item.line_item)
-        end.first
-      end
-
       def quantity(state=nil)
         case state
         when :on_hand
