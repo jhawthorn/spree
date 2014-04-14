@@ -19,18 +19,16 @@ module Spree
       private
       def adjust_packages
         order.line_items.each do |line_item|
-          adjuster = @adjuster_class.new(line_item.variant, line_item.quantity, :on_hand)
+          adjuster = @adjuster_class.new(line_item.variant, line_item.quantity)
 
-          visit_packages(adjuster)
-
-          adjuster.status = :backordered
-          visit_packages(adjuster)
+          visit_packages(adjuster, :on_hand)
+          visit_packages(adjuster, :backordered)
         end
       end
 
-      def visit_packages(adjuster)
+      def visit_packages(adjuster, status)
         packages.each do |package|
-          item = package.find_item adjuster.variant, adjuster.status
+          item = package.find_item adjuster.variant, status
           adjuster.adjust(item) if item
         end
       end

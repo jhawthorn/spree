@@ -3,12 +3,11 @@
 module Spree
   module Stock
     class Adjuster
-      attr_accessor :variant, :need, :status
+      attr_accessor :variant, :need
 
-      def initialize(variant, quantity, status)
+      def initialize(variant, quantity)
         @variant = variant
         @need = quantity
-        @status = status
       end
 
       def adjust(item)
