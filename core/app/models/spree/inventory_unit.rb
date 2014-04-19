@@ -4,12 +4,12 @@ module Spree
     belongs_to :shipment, class_name: "Spree::Shipment", touch: true, inverse_of: :inventory_units
     belongs_to :return_authorization, class_name: "Spree::ReturnAuthorization"
     belongs_to :line_item, class_name: "Spree::LineItem", inverse_of: :inventory_units
-    delegate :order, to: :line_item
+    delegate :order, to: :shipment
 
     scope :backordered, -> { where state: 'backordered' }
     scope :shipped, -> { where state: 'shipped' }
     scope :backordered_per_variant, ->(stock_item) do
-      includes(:shipment, line_item: :order)
+      includes(shipment: :order)
         .where("spree_shipments.state != 'canceled'").references(:shipment)
         .where(variant_id: stock_item.variant_id)
         .where('spree_orders.completed_at is not null')
