@@ -21,7 +21,6 @@ module Spree
       event :fill_backorder do
         transition to: :on_hand, from: :backordered
       end
-      after_transition on: :fill_backorder, do: :update_order
 
       event :ship do
         transition to: :shipped, if: :allow_ship?
@@ -67,10 +66,6 @@ module Spree
 
       def allow_ship?
         Spree::Config[:allow_backorder_shipping] || self.on_hand?
-      end
-
-      def update_order
-        order.update!
       end
   end
 end
