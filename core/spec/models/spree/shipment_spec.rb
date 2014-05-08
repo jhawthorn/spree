@@ -57,18 +57,6 @@ describe Spree::Shipment do
     end
   end
 
-  context "display_item_cost" do
-    it "retuns a Spree::Money" do
-      shipment.stub(:item_cost) { 21.22 }
-      shipment.display_item_cost.should == Spree::Money.new(21.22)
-    end
-  end
-
-  it "#item_cost" do
-    shipment = create(:shipment, order: create(:order_with_totals))
-    shipment.item_cost.should eql(10.0)
-  end
-
   it "#discounted_cost" do
     shipment = create(:shipment)
     shipment.cost = 10

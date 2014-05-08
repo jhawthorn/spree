@@ -143,10 +143,6 @@ module Spree
     end
     alias display_amount display_cost
 
-    def item_cost
-      line_items.map(&:amount).sum
-    end
-
     def discounted_cost
       cost + promo_total
     end
@@ -171,10 +167,6 @@ module Spree
       Spree::Money.new(final_price, { currency: currency })
     end
 
-    def display_item_cost
-      Spree::Money.new(item_cost, { currency: currency })
-    end
-
     def editable_by?(user)
       !shipped?
     end
@@ -195,10 +187,6 @@ module Spree
           ManifestItem.new(line_item, variant, units.length, states)
         end
       end.flatten
-    end
-
-    def line_items
-      inventory_units.includes(:line_item).map(&:line_item).uniq
     end
 
     def finalize!
