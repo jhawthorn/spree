@@ -62,11 +62,6 @@ module Spree
       self[:cost_price] = parse_price(price) if price.present?
     end
 
-    # returns number of units currently on backorder for this variant.
-    def on_backorder
-      inventory_units.with_state('backordered').size
-    end
-
     def options_text
       values = self.option_values.sort do |a, b|
         a.option_type.position <=> b.option_type.position
