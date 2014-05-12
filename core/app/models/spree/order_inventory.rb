@@ -29,11 +29,11 @@ module Spree
       end
     end
 
-    def inventory_units
-      line_item.inventory_units
-    end
-
     private
+      def inventory_units
+        line_item.inventory_units
+      end
+
       def remove(item_units, shipment = nil)
         quantity = item_units.size - line_item.quantity
 
