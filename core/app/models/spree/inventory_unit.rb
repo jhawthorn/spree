@@ -2,6 +2,7 @@ module Spree
   class InventoryUnit < ActiveRecord::Base
     PRE_SHIPMENT_STATES = %w(backordered on_hand)
     POST_SHIPMENT_STATES = %w(returned)
+    CANCELABLE_STATES = ['on_hand', 'backordered']
 
     belongs_to :variant, class_name: "Spree::Variant", inverse_of: :inventory_units
     belongs_to :order, class_name: "Spree::Order", inverse_of: :inventory_units
@@ -18,6 +19,9 @@ module Spree
     scope :shipped, -> { where state: 'shipped' }
     scope :post_shipment, -> { where(state: POST_SHIPMENT_STATES) }
     scope :returned, -> { where state: 'returned' }
+    scope :canceled, -> { where(state: 'canceled') }
+    scope :not_canceled, -> { where.not(state: 'canceled') }
+    scope :cancelable, -> { where(state: Spree::InventoryUnit::CANCELABLE_STATES) }
     scope :backordered_per_variant, ->(stock_item) do
       includes(:shipment, :order)
         .where("spree_shipments.state != 'canceled'").references(:shipment)
@@ -46,6 +50,10 @@ module Spree
 
       event :return do
         transition to: :returned, from: :shipped
+      end
+
+      event :cancel do
+        transition to: :canceled, from: CANCELABLE_STATES.map(&:to_sym)
       end
     end
 
